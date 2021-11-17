@@ -59,6 +59,8 @@ def get_metadata():
         "plug": plug,
         "is_admin" : is_member_of_group(uid, 'eboard') or is_member_of_group(uid, 'rtp')
     }
+    if not metadata['is_admin']:
+        abort(403)
     return metadata
 
 @app.route('/', methods=['GET'])
@@ -266,7 +268,7 @@ def submit_report(quote_id):
     db.session.add(new_report)
     db.session.commit()
     if app.config['MAIL_SERVER'] != '':
-        send_report_email( metadata['uid'], Quote.query.get(quote_id) )
+        send_report_email( metadata['uid'], Quote.query.get(quote_id), app.config['SERVER_NAME'] )
     flash("Report Successful!")
     return redirect('/storage')
 
